@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Economia — Atlas Energia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream:      #F5F1DC;
+    --cream-dark: #E8E2C4;
+    --cream-mid:  #EDE8D0;
+    --sage-50:    #EDF2E9;
+    --sage-100:   #C9D9C0;
+    --sage-400:   #7D9A6A;
+    --sage-600:   #5E7A50;
+    --sage-700:   #4A5E42;
+    --sage-800:   #3E5535;
+    --sage-900:   #2D3D28;
+    --amber:      #C9933A;
+    --amber-light:#F0C96A;
+    --white:      #FFFFFF;
+    --gray-300:   #C4C4BC;
+    --gray-500:   #6B6B60;
+    --gray-800:   #2C2C28;
+  }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cream);
+    color: var(--gray-800);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    background: var(--cream);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1.5px solid var(--cream-dark);
+  }
+
+  header img {
+    height: 56px;
+    object-fit: contain;
+  }
+
+  .hero {
+    background: var(--sage-700);
+    padding: 48px 24px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(240,201,106,0.08);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: rgba(240,201,106,0.05);
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1.2;
+    max-width: 520px;
+    margin: 0 auto 12px;
+  }
+
+  .hero p {
+    font-size: 15px;
+    color: var(--sage-100);
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+    opacity: 0.88;
+    font-weight: 600;
+  }
+
+  .calculator-wrapper {
+    max-width: 760px;
+    margin: -48px auto 0;
+    padding: 0 16px 64px;
+  }
+
+  .input-card {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 28px 26px 22px;
+    box-shadow: 0 6px 32px rgba(45,61,40,0.13);
+    margin-bottom: 24px;
+  }
+
+  .input-card label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    border: 2.5px solid var(--cream-dark);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .input-group:focus-within { border-color: var(--sage-400); }
+
+  .input-prefix {
+    background: var(--cream-mid);
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--sage-600);
+    border-right: 1.5px solid var(--cream-dark);
+    user-select: none;
+  }
+
+  #bill {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 14px 16px;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--gray-800);
+    background: transparent;
+    width: 100%;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  #bill::placeholder { color: var(--gray-300); font-weight: 600; }
+
+  .slider-wrapper { margin-top: 18px; }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-500);
+    margin-bottom: 7px;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--cream-dark);
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--sage-600);
+    cursor: pointer;
+    border: 3px solid var(--white);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.22);
+  }
+
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .plan-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 20px 22px;
+    border: 2.5px solid var(--cream-dark);
+    position: relative;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+
+  .plan-card:hover { border-color: var(--sage-100); transform: translateY(-3px); }
+
+  .plan-card.featured { border-color: var(--sage-400); }
+
+  .badge-featured {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--sage-400);
+    color: var(--cream);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .plan-discount {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--sage-600);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .plan-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 14px;
+  }
+
+  .plan-fidelidade {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--sage-700);
+    background: var(--sage-50);
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .plan-divider { height: 1.5px; background: var(--cream-dark); margin-bottom: 16px; }
+
+  .plan-stat { margin-bottom: 12px; }
+
+  .plan-stat-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .plan-stat-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+
+  .plan-stat-value.highlight {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--sage-600);
+  }
+
+  .est-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--amber);
+    background: #FDF3DC;
+    border: 1px solid #EDCD82;
+    padding: 1px 7px;
+    border-radius: 10px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+
+  .savings-table {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1.5px solid var(--cream-dark);
+    margin-bottom: 24px;
+  }
+
+  .savings-table h3 {
+    padding: 14px 20px 12px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--sage-700);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    border-bottom: 1.5px solid var(--cream-dark);
+    background: var(--cream-mid);
+  }
+
+  .est-notice {
+    padding: 8px 20px 10px;
+    font-size: 11px;
+    color: var(--amber);
+    font-weight: 700;
+    background: #FDFAF0;
+    border-bottom: 1px solid #F0E8C0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  th {
+    padding: 10px 14px;
+    text-align: right;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--gray-500);
+    background: var(--cream);
+    border-bottom: 1px solid var(--cream-dark);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  th:first-child { text-align: left; }
+
+  td {
+    padding: 13px 14px;
+    text-align: right;
+    border-bottom: 1px solid var(--cream-dark);
+    color: var(--gray-800);
+    font-weight: 600;
+  }
+
+  td:first-child { text-align: left; font-weight: 800; }
+  tr:last-child td { border-bottom: none; }
+
+  .tr-featured td { background: var(--sage-50); }
+  .tr-featured td:first-child { color: var(--sage-600); }
+  .td-savings { color: var(--sage-600) !important; font-weight: 800 !important; }
+
+  .cta-section {
+    background: var(--sage-800);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(240,201,106,0.08);
+    pointer-events: none;
+  }
+
+  .cta-section h2 {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--cream);
+    margin-bottom: 8px;
+  }
+
+  .cta-section p {
+    font-size: 14px;
+    color: var(--sage-100);
+    margin-bottom: 22px;
+    line-height: 1.6;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 800;
+    padding: 15px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-family: 'Nunito', sans-serif;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-2px); }
+  .btn-whatsapp:active { transform: scale(0.98); }
+  .btn-whatsapp svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  footer {
+    text-align: center;
+    padding: 22px 16px;
+    font-size: 12px;
+    color: var(--gray-500);
+    font-weight: 600;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--cream-dark);
+  }
+
+  .empty-state svg { opacity: 0.5; }
+  .empty-state p { font-size: 14px; margin-top: 12px; color: var(--gray-500); font-weight: 600; }
+
+  @media (max-width: 540px) {
+    .hero h1 { font-size: 24px; }
+    .plans-grid { grid-template-columns: 1fr; }
+    .input-card { padding: 20px 16px; }
+    #bill { font-size: 20px; }
+    .plan-discount { font-size: 40px; }
+    th, td { padding: 10px 8px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo-atlas.png" alt="Atlas Energia">
+</header>
+
+<div class="hero">
+  <h1>Quanto você vai economizar na conta de luz?</h1>
+  <p>Informe o valor médio da sua conta e veja a economia estimada em cada plano.</p>
+</div>
+
+<div class="calculator-wrapper">
+
+  <div class="input-card">
+    <label for="bill">Valor médio da conta de luz</label>
+    <div class="input-group">
+      <span class="input-prefix">R$</span>
+      <input type="number" id="bill" placeholder="0,00" min="0" max="10000" step="10" oninput="calcular()">
+    </div>
+    <div class="slider-wrapper">
+      <div class="slider-labels">
+        <span>R$ 100</span>
+        <span>R$ 2.500</span>
+        <span>R$ 5.000</span>
+        <span>R$ 7.500</span>
+        <span>R$ 10.000</span>
+      </div>
+      <input type="range" id="slider" min="100" max="10000" step="50" value="500" oninput="syncSlider(this.value)">
+    </div>
+  </div>
+
+  <div id="results-area">
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+      </svg>
+      <p>Insira o valor da sua conta para ver as opções de economia.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Atlas Energia &nbsp;·&nbsp; (62) 99872-0037 &nbsp;·&nbsp; @oatlasenergia
+</footer>
+
+<script>
+const plans = [
+  { label: 'Plano 18%', discount: 0.18, fidelidade: 'Sem fidelidade', years: null, featured: true },
+  { label: 'Plano 20%', discount: 0.20, fidelidade: 'Fidelidade 3 anos', years: 3, featured: false },
+  { label: 'Plano 25%', discount: 0.25, fidelidade: 'Fidelidade 10 anos', years: 10, featured: false },
+];
+
+function fmt(val) {
+  return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+}
+
+function calcular() {
+  const val = parseFloat(document.getElementById('bill').value);
+  document.getElementById('slider').value = Math.min(Math.max(val || 100, 100), 10000);
+  renderResults(val);
+}
+
+function syncSlider(v) {
+  document.getElementById('bill').value = v;
+  renderResults(parseFloat(v));
+}
+
+const EST = '<span class="est-tag">estimativa</span>';
+
+function renderResults(bill) {
+  const area = document.getElementById('results-area');
+  if (!bill || bill <= 0) {
+    area.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+      </svg>
+      <p>Insira o valor da sua conta para ver as opções de economia.</p>
+    </div>`;
+    return;
+  }
+
+  const cardsHTML = plans.map(p => {
+    const savings = bill * p.discount;
+    const newBill = bill - savings;
+    const annualSavings = savings * 12;
+    const totalSavings = p.years ? savings * 12 * p.years : annualSavings;
+    const totalLabel = p.years ? `Economia em ${p.years} anos` : 'Economia em 1 ano';
+
+    return `
+    <div class="plan-card ${p.featured ? 'featured' : ''}">
+      ${p.featured ? '<div class="badge-featured">⭐ Mais escolhido</div>' : ''}
+      <div class="plan-discount">${Math.round(p.discount * 100)}%</div>
+      <div class="plan-label">de desconto</div>
+      <div class="plan-fidelidade">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        ${p.fidelidade}
+      </div>
+      <div class="plan-divider"></div>
+      <div class="plan-stat">
+        <div class="plan-stat-label">Nova mensalidade ${EST}</div>
+        <div class="plan-stat-value">${fmt(newBill)}</div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-label">Economia por mês ${EST}</div>
+        <div class="plan-stat-value highlight">${fmt(savings)}</div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-label">${totalLabel} ${EST}</div>
+        <div class="plan-stat-value">${fmt(totalSavings)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const tableRows = plans.map(p => {
+    const savings = bill * p.discount;
+    const newBill = bill - savings;
+    return `<tr class="${p.featured ? 'tr-featured' : ''}">
+      <td>${p.label}</td>
+      <td>${fmt(newBill)}</td>
+      <td class="td-savings">${fmt(savings)}</td>
+      <td class="td-savings">${fmt(savings * 12)}</td>
+      <td class="td-savings">${fmt(savings * 36)}</td>
+      <td class="td-savings">${fmt(savings * 60)}</td>
+    </tr>`;
+  }).join('');
+
+  const waMsg = encodeURIComponent(`Olá! Fiz a simulação na calculadora da Atlas Energia e minha conta é de ${fmt(bill)} por mês. Quero saber mais sobre os planos!`);
+
+  area.innerHTML = `
+    <div class="plans-grid">${cardsHTML}</div>
+
+    <div class="savings-table">
+      <h3>Comparativo de economia projetada</h3>
+      <div class="est-notice">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        Valores são estimativas com base no desconto aplicado sobre a conta atual e não representam valor legal.
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Plano</th>
+            <th>Nova conta</th>
+            <th>Mensal</th>
+            <th>1 ano</th>
+            <th>3 anos</th>
+            <th>5 anos</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+
+    <div class="cta-section">
+      <h2>Pronto para economizar?</h2>
+      <p>Fale com nossa equipe agora e comece a pagar menos na conta de luz.</p>
+      <a class="btn-whatsapp" href="https://wa.me/5562998720037?text=${waMsg}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Falar com um consultor
+      </a>
+    </div>`;
+}
+
+syncSlider(500);
+</script>
+</body>
+</html>
